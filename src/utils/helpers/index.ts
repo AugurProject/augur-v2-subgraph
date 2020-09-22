@@ -5,6 +5,7 @@ export {
   createAndSaveMigrateMarketEvent,
   createAndSaveFinalizeMarketEvent,
   createAndSaveOIChangeMarketEvent,
+  createAndSaveVolumeChangeMarketEvent,
   createAndSaveTransferMarketEvent,
   getEventId,
   getMarketTypeFromInt,

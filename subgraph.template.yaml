@@ -1,16 +1,16 @@
 specVersion: 0.0.2
-description: Subgraph for the Augur v2 Kovan contracts which tracks Universes, Markets, all the market events and disputing process, all user related balances and token events within the Augur ecosystem (Reputation, Participation and Dispute tokens), as well as metadata from the Augur contract.
-repository: https://github.com/protofire/augur-v2-subgraph
+description: Subgraph for the Augur v2 ({{ network }}) contracts which tracks Universes, Markets, all the market events and disputing process, all user related balances and token events within the Augur ecosystem (Reputation, Participation and Dispute tokens), as well as metadata from the Augur contract.
+repository: https://github.com/AugurProject/augur-v2-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Augur
-    network: mainnet
+    network: {{ network }}
     source:
-      address: "0x23916a8F5C3846e3100e5f587FF14F3098722F5d"
+      address: '{{ Augur }}'
       abi: Augur
-      startBlock: 10543755
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -100,6 +100,26 @@ dataSources:
           handler: handleRegisterContract
         - event: TimestampSet(uint256)
           handler: handleTimestampSet
+  - kind: ethereum/contract
+    name: AugurTrading
+    network: {{ network }}
+    source:
+      address: '{{ AugurTrading }}'
+      abi: Augur
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/index.ts
+      entities:
+        - VolumeChangeMarketEvent
+      abis:
+        - name: Augur
+          file: ./abis/Augur.json
+      eventHandlers:
+        - event: MarketVolumeChanged(indexed address,indexed address,uint256,uint256[],uint256,uint256)
+          handler: handleMarketVolumeChanged
 
 # Markets
   # DONE MarketCreated(indexed address,uint256,string,address,indexed address,address,uint256,int256[],uint8,uint256,bytes32[],uint256,uint256)
@@ -107,6 +127,7 @@ dataSources:
   # DONE MarketMigrated(indexed address,indexed address,indexed address)
   # DONE MarketTransferred(indexed address,indexed address,address,address)
   # DONE MarketOIChanged(indexed address,indexed address,uint256)
+  # DONE MarketVolumeChanged(indexed address,indexed address,uint256,uint256[],uint256,uint256)
   # - MarketParticipantsDisavowed(indexed address,indexed address)
   # - MarketRepBondTransferred(indexed address,address,address,address)
   # - TradingProceedsClaimed(indexed address,indexed address,address,uint256,uint256,uint256,uint256,uint256)

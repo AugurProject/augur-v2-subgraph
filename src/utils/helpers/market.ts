@@ -5,6 +5,7 @@ import {
   CreateMarketEvent,
   TransferMarketEvent,
   OIChangeMarketEvent,
+  VolumeChangeMarketEvent,
   MarketReport,
   Outcome,
   MarketTemplate,
@@ -15,7 +16,8 @@ import {
   MarketTransferred,
   MarketMigrated,
   MarketFinalized,
-  MarketOIChanged
+  MarketOIChanged,
+  MarketVolumeChanged
 } from "../../../generated/Augur/Augur";
 import {
   ethereum,
@@ -130,6 +132,24 @@ export function createAndSaveOIChangeMarketEvent(
   event.tx_hash = ethereumEvent.transaction.hash.toHexString();
 
   event.openInterest = ethereumEvent.params.marketOI;
+
+  event.save();
+}
+
+export function createAndSaveVolumeChangeMarketEvent(
+  ethereumEvent: MarketVolumeChanged
+): void {
+  let id = getEventId(ethereumEvent);
+  let event = new VolumeChangeMarketEvent(id);
+
+  event.market = ethereumEvent.params.market.toHexString();
+  event.timestamp = ethereumEvent.block.timestamp;
+  event.block = ethereumEvent.block.number;
+  event.tx_hash = ethereumEvent.transaction.hash.toHexString();
+
+  event.volume = ethereumEvent.params.volume;
+  event.outcomeVolumes = ethereumEvent.params.outcomeVolumes
+  event.totalTrades = ethereumEvent.params.totalTrades;
 
   event.save();
 }

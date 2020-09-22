@@ -13,7 +13,8 @@ import {
   MarketTransferred,
   MarketMigrated,
   MarketFinalized,
-  MarketOIChanged
+  MarketOIChanged,
+  MarketVolumeChanged
 } from "../../generated/Augur/Augur";
 import {
   getOrCreateUniverse,
@@ -26,6 +27,7 @@ import {
   createAndSaveTransferMarketEvent,
   createAndSaveFinalizeMarketEvent,
   createAndSaveOIChangeMarketEvent,
+  createAndSaveVolumeChangeMarketEvent,
   getMarketTypeFromInt,
   createOutcomesForMarket,
   updateOutcomesForMarket,
@@ -207,4 +209,17 @@ export function handleMarketOIChanged(event: MarketOIChanged): void {
   market.save();
 
   createAndSaveOIChangeMarketEvent(event);
+}
+
+// - event: MarketVolumeChanged(indexed address,indexed address,uint256,uint256[],uint256,uint256)
+//   handler: handleMarketVolumeChanged
+
+export function handleMarketVolumeChanged(event: MarketVolumeChanged): void {
+  let market = getOrCreateMarket(event.params.market.toHexString());
+  market.volume = event.params.volume;
+  market.outcomeVolumes = event.params.outcomeVolumes
+  market.totalTrades = event.params.totalTrades;
+  market.save();
+
+  createAndSaveVolumeChangeMarketEvent(event);
 }
